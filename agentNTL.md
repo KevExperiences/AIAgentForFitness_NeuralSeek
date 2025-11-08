@@ -10,4 +10,4 @@ Calendar Confirmation: << name: calendarConfirmation, prompt: false >>
 Workout Plan: << name: workoutPlan, prompt: false >>
 Meal Plan: << name: mealPlan, prompt: false >>=>{{ variable  | name: "emailBody" | mode: "overwrite" }}
 {{ createDOC  | file: "WeeklyWorkoutPlan" }}=>{{ doc  | name: "WeeklyWorkoutPlan" }}=>{{ writeCacheKey  | index: "" | key: "" | value: "" }}
-{{ email  | host: "smtp.gmail.com" | port: "587" | user: "erv4968" | pass: "H9eL.#3BuWoP0*88faSQg.eV" | from: "erv4968@gmail.com" | to: "kevinchenjvc@gmail.com" | subject: "Your Weekly Workout & Meal Plan is Here!" | message: "<< name: emailBody, prompt: false >>" | attachment: "WeeklyWorkoutPlan" }}
+{{ email  | host: "smtp.gmail.com" | port: "587" | user: "erv4968" | pass: "" | from: "" | to: "" | subject: "Your Weekly Workout & Meal Plan is Here!" | message: "<< name: emailBody, prompt: false >>" | attachment: "WeeklyWorkoutPlan" }}
