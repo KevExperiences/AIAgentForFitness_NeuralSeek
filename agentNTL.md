@@ -1,0 +1,13 @@
+<< name: preferredWorkoutTimes, prompt: true, desc: "Preferred workout times and length" >>
+<< name: preferredMealTimes, prompt: true, desc: "Preferred meal times and length" >>
+<< name: workoutPreferences, prompt: true, desc: "Preferred workout activities (e.g., tennis, walking, weights)" >>
+<< name: dietaryPreferences, prompt: true, desc: "Dietary preferences or restrictions" >>=>{{ searchCacheIndex  | index: "<< name: preferredWorkoutTimes, prompt: false >>" | value: "" | limit: "5" }}=>{{ readCacheKey  | index: "<< name: preferredWorkoutTimes, prompt: false >>" | key: "" }}
+{{ LLM  | prompt: "Find daily time slots for workouts and meals based on the following preferences. Avoid any calendar conflicts based on the provided workout times: << name: preferredWorkoutTimes >>. Avoid conflicting times with meal times: << name: preferredMealTimes >> Output the best available time slots in JSON format with keys: 'date', 'workoutStartTime', 'workoutEndTime', 'mealStartTime', and 'mealEndTime'." | cache: "true" | modelCard: "ns-GPT4o" }}=>{{ jsonToVars  }}
+{{ condition  | value: "'<< name: preferredWorkoutTimes, prompt: false >>' != ''" }}=>{{ LLM  | prompt: "Schedule daily calendar invites for workouts and meals at the available time slots. Include workout activities based on preferences: << name: workoutPreferences >>. Send invites to the user." | cache: "true" | modelCard: "ns-claude3.5-haiku" }}=>{{ variable  | name: "calendarConfirmation" }}
+{{ condition  | value: "'<< name: calendarConfirmation, prompt: false >>' != ''" }}=>{{ LLM  | prompt: "Create a customized weekly workout plan based on the user's preferences: << name: workoutPreferences >>. Link this plan to the calendar invites." | cache: "true" }}=>{{ variable  | name: "workoutPlan" }}
+{{ LLM  | prompt: "Plan a Word Document-formatted healthy dinner for 5 out of 7 nights in the week based on the user's dietary preferences: << name: dietaryPreferences >>. Create a grocery/shopping list for the planned meals." | cache: "true" }}=>{{ variable  | name: "mealPlan" }}
+Calendar Confirmation: << name: calendarConfirmation, prompt: false >>
+Workout Plan: << name: workoutPlan, prompt: false >>
+Meal Plan: << name: mealPlan, prompt: false >>=>{{ variable  | name: "emailBody" | mode: "overwrite" }}
+{{ createDOC  | file: "WeeklyWorkoutPlan" }}=>{{ doc  | name: "WeeklyWorkoutPlan" }}=>{{ writeCacheKey  | index: "" | key: "" | value: "" }}
+{{ email  | host: "smtp.gmail.com" | port: "587" | user: "erv4968" | pass: "H9eL.#3BuWoP0*88faSQg.eV" | from: "erv4968@gmail.com" | to: "kevinchenjvc@gmail.com" | subject: "Your Weekly Workout & Meal Plan is Here!" | message: "<< name: emailBody, prompt: false >>" | attachment: "WeeklyWorkoutPlan" }}
